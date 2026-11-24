@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Education from '../components/Education.astro';
+import Skills from '../components/Skills.astro';
+import Experience from '../components/Experience.astro';
+import Projects from '../components/Projects.astro';
+import Leadership from '../components/Leadership.astro';
+import Contact from '../components/Contact.astro';
+import { person } from '../data/resume';
+
+const links = [
+  ['education', 'Education'],
+  ['skills', 'Skills'],
+  ['experience', 'Experience'],
+  ['projects', 'Projects'],
+  ['leadership', 'Leadership'],
+  ['contact', 'Contact'],
+];
+---
+<Base>
+  <nav class="nav" aria-label="Sections">
+    <a class="mark" href="#top">{person.name}</a>
+    <ul>{links.map(([id, label]) => <li><a class="link" href={`#${id}`}>{label}</a></li>)}</ul>
+  </nav>
+  <main>
+    <Hero />
+    <Education />
+    <Skills />
+    <Experience />
+    <Projects />
+    <Leadership />
+    <Contact />
+  </main>
+</Base>

@@ -1,0 +1,86 @@
+---
+import { projects } from '../data/resume';
+const base = import.meta.env.BASE_URL;
+const src = (p: string) => `${base}/${p}`.replace(/\/+/g, '/');
+---
+<section id="projects" class="node" data-node data-pad-offset="28">
+  <header class="sec-head" data-pull><span class="ref">U5</span><h2>Projects</h2></header>
+
+  <div class="asm">
+    {projects.map((p, i) => (
+      <article class="build" data-pull style={`--i:${i + 1}`}>
+        <div class="frame">
+          <div class="slot">
+            {p.photo ? <img src={src(p.photo)} alt={p.name} loading="lazy" /> : <span>Project photo goes here</span>}
+          </div>
+          <span class="fid tl"></span><span class="fid tr"></span><span class="fid bl"></span>
+          <span class="tag">ASM-{i + 1}</span>
+        </div>
+
+        <div class="info">
+          <div class="meta">
+            <span class="status">{p.status}</span>
+            <span class="when">{p.when}</span>
+          </div>
+          <h3>{p.name}</h3>
+          <p class="sum">{p.summary}</p>
+
+          <table class="bom">
+            <caption>Bill of materials</caption>
+            <thead><tr><th>Ref</th><th class="q">Qty</th><th>Part</th></tr></thead>
+            <tbody>
+              {p.bom.map((b) => (
+                <tr><td class="ref-d">{b.ref}</td><td class="q">{b.qty}</td><td>{b.part}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .asm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(28px, 4vw, 56px); }
+  .build { display: grid; align-content: start; gap: 26px; }
+
+  .frame { position: relative; padding: 22px; border: 1px solid var(--line); }
+  .frame .slot { aspect-ratio: 4 / 3; }
+  /* fiducials: bare copper dot inside a clearance ring, as on a real panel */
+  .fid {
+    position: absolute;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 5px var(--mask), 0 0 0 6px var(--line);
+  }
+  .tl { top: 4px; left: 4px; }
+  .tr { top: 4px; right: 4px; }
+  .bl { bottom: 4px; left: 4px; }
+  .tag {
+    position: absolute;
+    right: 22px; bottom: -11px;
+    padding: 0 8px;
+    background: var(--mask);
+    font: 500 13px/22px var(--mono);
+    color: var(--silk-2);
+  }
+
+  .info { display: grid; gap: 14px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; font: 500 13px/1 var(--mono); }
+  .status { color: var(--ink); background: var(--gold); padding: 6px 8px; }
+  .when { color: var(--silk-2); }
+  h3 { font: 800 clamp(30px, 3.4vw, 44px)/1 var(--display); text-transform: uppercase; }
+  .sum { color: var(--silk-2); max-width: 38em; }
+
+  .bom { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 15px; }
+  .bom caption { text-align: left; font: 600 13px/1 var(--mono); color: var(--copper-hot); padding-bottom: 10px; }
+  .bom th { text-align: left; font: 500 13px/1 var(--mono); color: var(--silk-2); padding: 8px 10px 8px 0; border-bottom: 1px solid var(--silk); }
+  .bom td { padding: 9px 10px 9px 0; border-bottom: 1px dashed var(--line); }
+  .bom .q { text-align: right; padding-right: 18px; width: 4em; font-family: var(--mono); font-size: 14px; }
+  .ref-d { font: 600 14px/1.4 var(--mono); color: var(--gold); white-space: nowrap; width: 7em; }
+
+  @media (max-width: 860px) {
+    .asm { grid-template-columns: 1fr; gap: 72px; }
+  }
+</style>

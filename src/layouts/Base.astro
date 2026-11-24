@@ -1,0 +1,29 @@
+---
+import '@fontsource-variable/big-shoulders-display';
+import '@fontsource-variable/instrument-sans';
+import '@fontsource-variable/martian-mono';
+import '../styles/global.css';
+import { person } from '../data/resume';
+
+interface Props { title?: string }
+const { title = `${person.name} | Computer Engineer` } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={person.intro} />
+    <meta name="theme-color" content="#0a2219" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`.replace(/\/+/g, '/')} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <canvas id="board" aria-hidden="true"></canvas>
+    <slot />
+    <script>
+      import { startBoard } from '../scripts/board';
+      startBoard(document.getElementById('board') as HTMLCanvasElement);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,105 @@
+---
+import { education as e } from '../data/resume';
+---
+<section id="education" class="node" data-node data-pad-offset="28">
+  <header class="sec-head" data-pull><span class="ref">U2</span><h2>Education</h2></header>
+
+  <div class="tb">
+    <div class="c school" data-pull style="--i:1">
+      <span class="k">Institution</span>
+      <span class="v big">{e.school}</span>
+      <span class="sub">{e.place}</span>
+    </div>
+    <div class="c gpa" data-pull style="--i:2">
+      <span class="k">GPA</span>
+      <span class="num">{e.gpa}</span>
+      <span class="sub">of 4.00</span>
+    </div>
+    <div class="c" data-pull style="--i:3">
+      <span class="k">Degree</span>
+      <span class="v">{e.degree}</span>
+    </div>
+    <div class="c" data-pull style="--i:4">
+      <span class="k">Graduation</span>
+      <span class="v">{e.grad}</span>
+    </div>
+    <div class="c wide" data-pull style="--i:5">
+      <span class="k">Relevant coursework</span>
+      <ul class="list">{e.coursework.map((c) => <li>{c}</li>)}</ul>
+    </div>
+    <div class="c wide" data-pull style="--i:6">
+      <span class="k">Honors and awards</span>
+      <ul class="list honors">{e.honors.map((h) => <li>{h}</li>)}</ul>
+    </div>
+    <div class="c meta" data-pull style="--i:7"><span class="k">Drawing no.</span><span class="m">SK-EDU-001</span></div>
+    <div class="c meta" data-pull style="--i:7"><span class="k">Revision</span><span class="m">B</span></div>
+    <div class="c meta" data-pull style="--i:7"><span class="k">Sheet</span><span class="m">1 of 1</span></div>
+  </div>
+</section>
+
+<style>
+  .tb {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr);
+    border: 2px solid var(--silk);
+  }
+  .c {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    padding: 18px 22px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .k { font: 500 13px/1.2 var(--mono); color: var(--silk-2); }
+  .v { font: 600 21px/1.3 var(--body); }
+  .v.big { font: 800 clamp(30px, 3.6vw, 44px)/1.02 var(--display); text-transform: uppercase; }
+  .sub { color: var(--silk-2); font-size: 15px; }
+
+  .school { grid-column: span 2; }
+  .gpa {
+    grid-row: span 2;
+    grid-column: 3;
+    border-right: 0;
+    align-content: center;
+    background: var(--silk);
+    color: var(--ink);
+  }
+  .gpa .k, .gpa .sub { color: var(--ink-2); }
+  .num { font: 900 clamp(64px, 8vw, 112px)/0.9 var(--display); letter-spacing: -0.01em; }
+
+  .wide { grid-column: 1 / -1; border-right: 0; }
+  .list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 26px;
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 17px;
+  }
+  .list li { position: relative; padding-left: 16px; }
+  .list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0.62em;
+    width: 7px; height: 7px;
+    background: var(--copper);
+  }
+  .honors li::before { border-radius: 50%; background: transparent; border: 2px solid var(--gold); width: 9px; height: 9px; top: 0.5em; }
+
+  .meta { border-bottom: 0; grid-auto-flow: column; justify-content: space-between; align-items: baseline; padding-block: 12px; }
+  .meta:last-child { border-right: 0; }
+  .m { font: 600 14px/1 var(--mono); }
+
+  @media (max-width: 760px) {
+    .tb { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .school { grid-column: 1 / -1; border-right: 0; }
+    .gpa { grid-column: auto; grid-row: auto; }
+    .c:nth-child(3) { grid-column: 2; }
+    .c:nth-child(4) { grid-column: 1 / -1; border-right: 0; }
+    .meta { grid-column: 1 / -1; border-right: 0; border-bottom: 1px solid var(--line); }
+    .meta:last-child { border-bottom: 0; }
+    .c { padding: 14px 16px; }
+  }
+</style>

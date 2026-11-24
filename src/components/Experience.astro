@@ -1,0 +1,223 @@
+---
+import { experience } from '../data/resume';
+
+const NOW = '2026-11';
+const T0 = 2025 * 12;          // Jan 2025
+const SPAN = 24;               // months on screen (Jan 2025 to Dec 2026)
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const m = (s: string) => { const [y, mo] = s.split('-').map(Number); return y * 12 + (mo - 1); };
+const x = (s: string, endOfMonth = false) =>
+  Math.max(0, Math.min(100, ((m(s) - T0 + (endOfMonth ? 1 : 0)) / SPAN) * 100));
+const fmt = (s: string | null) => (s ? `${MONTHS[m(s) % 12]} ${Math.floor(m(s) / 12)}` : 'present');
+
+const colors = ['#ffcf8a', '#8fe3b0', '#a9cfff', '#f2efe4'];
+const chans = experience.map((e, i) => {
+  const x1 = x(e.start);
+  const x2 = e.end ? x(e.end, true) : x(NOW, true);
+  const months = m(e.end ?? NOW) - m(e.start) + 1;
+  return { ...e, i, x1, x2, open: !e.end, months, color: colors[i % colors.length] };
+});
+const nowX = x(NOW, true);
+const ticks = Array.from({ length: SPAN / 3 }, (_, k) => {
+  const mo = k * 3;
+  const label = mo % 12 === 0 ? String(2025 + mo / 12) : MONTHS[mo % 12];
+  return { left: (mo / SPAN) * 100, label, major: mo % 12 === 0 };
+});
+---
+<section id="experience" class="node" data-node data-pad-offset="28">
+  <header class="sec-head" data-pull><span class="ref">U4</span><h2>Experience</h2></header>
+
+  <div class="la" data-pull style="--i:1">
+    <div class="bar">
+      <span>Logic analyzer</span>
+      <span>{chans.length} channels</span>
+      <span>3 months / div</span>
+      <span class="hint">Select a channel to decode it</span>
+    </div>
+
+    <div class="grid">
+      <div class="axis" aria-hidden="true">
+        <div class="lbl"></div>
+        <div class="track">
+          {ticks.map((t) => <span class:list={['tick', { major: t.major }]} style={`left:${t.left}%`}>{t.label}</span>)}
+        </div>
+      </div>
+
+      <div class="rows" role="tablist" aria-label="Work experience channels">
+        {chans.map((c) => (
+          <button
+            class="row" role="tab" id={`tab-${c.id}`} aria-controls={`dec-${c.id}`}
+            aria-selected={c.i === 0 ? 'true' : 'false'} tabindex={c.i === 0 ? 0 : -1}
+            style={`--c:${c.color}`}
+          >
+            <span class="lbl"><span class="d">D{c.i}</span><span class="org">{c.short}</span></span>
+            <span class="track">
+              <svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+                <rect class="hi" x={c.x1} y="8" width={c.x2 - c.x1} height="24" />
+                <path class="w" d={`M0 32 H${c.x1} V8 H${c.x2}${c.open ? '' : ' V32 H100'}`} />
+                {c.open && <path class="w dash" d={`M${c.x2} 8 H100`} />}
+              </svg>
+            </span>
+          </button>
+        ))}
+        <span class="now" style={`--x:${nowX}`} aria-hidden="true"><span>now</span></span>
+      </div>
+    </div>
+
+    <div class="decoder">
+      {chans.map((c) => (
+        <div class="dec" role="tabpanel" id={`dec-${c.id}`} aria-labelledby={`tab-${c.id}`} hidden={c.i !== 0} style={`--c:${c.color}`}>
+          <div class="head">
+            <div>
+              <h3>{c.role}</h3>
+              <p class="org">{c.org}</p>
+            </div>
+            <dl class="meas">
+              <div><dt>Start</dt><dd>{fmt(c.start)}</dd></div>
+              <div><dt>End</dt><dd>{fmt(c.end)}</dd></div>
+              <div><dt>Δt</dt><dd>{c.months} mo{c.open ? '+' : ''}</dd></div>
+              <div><dt>Site</dt><dd>{c.place}</dd></div>
+            </dl>
+          </div>
+          <ol class="frames">
+            {c.bullets.map((b, k) => (
+              <li><span class="addr">0x{(k * 16).toString(16).toUpperCase().padStart(2, '0')}</span><span>{b}</span></li>
+            ))}
+          </ol>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector('#experience');
+  if (root) {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role=tab]'));
+    const select = (t: HTMLButtonElement, focus = false) => {
+      tabs.forEach((b) => {
+        const on = b === t;
+        b.setAttribute('aria-selected', String(on));
+        b.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(b.getAttribute('aria-controls')!);
+        if (panel) panel.hidden = !on;
+      });
+      if (focus) t.focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t));
+      t.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        select(tabs[(i + d + tabs.length) % tabs.length], true);
+      });
+    });
+  }
+</script>
+
+<style>
+  .la {
+    background: var(--scope);
+    border: 1px solid #1f3a2e;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), inset 0 0 0 6px #0b1a14;
+    padding: 6px;
+  }
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    padding: 12px 16px;
+    font: 500 13px/1.3 var(--mono);
+    color: var(--silk-2);
+    border-bottom: 1px solid #1f3a2e;
+  }
+  .bar span:first-child { color: var(--silk); }
+  .bar .hint { margin-left: auto; color: var(--copper-hot); }
+
+  .grid { --lbl: 250px; position: relative; padding: 10px 16px 16px; }
+  .axis, .row { display: grid; grid-template-columns: var(--lbl) minmax(0, 1fr); align-items: center; }
+  .axis .track { position: relative; height: 26px; border-bottom: 1px solid #2a4a3c; }
+  .tick {
+    position: absolute;
+    bottom: 6px;
+    transform: translateX(-50%);
+    font: 500 13px/1 var(--mono);
+    color: #9fb5a8;
+    white-space: nowrap;
+  }
+  .tick.major { color: var(--silk); font-weight: 700; }
+  .tick:first-child { transform: none; }
+
+  .rows { position: relative; }
+  .row {
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid #16291f;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    min-height: 64px;
+  }
+  .row .track {
+    position: relative;
+    height: 64px;
+    background-image:
+      linear-gradient(to right, #1a3127 1px, transparent 1px);
+    background-size: calc(100% / 8) 100%;
+  }
+  .row svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .w { fill: none; stroke: var(--c); stroke-width: 2; vector-effect: non-scaling-stroke; opacity: 0.55; transition: opacity 0.25s, stroke-width 0.25s; }
+  .dash { stroke-dasharray: 5 5; }
+  .hi { fill: var(--c); opacity: 0; transition: opacity 0.25s; }
+  .lbl { display: flex; align-items: baseline; gap: 12px; padding-right: 16px; }
+  .d { font: 700 13px/1 var(--mono); color: var(--c, var(--silk-2)); }
+  .row .org { font: 500 15px/1.25 var(--body); color: var(--silk-2); transition: color 0.2s; }
+  .row:hover .w { opacity: 0.85; }
+  .row[aria-selected='true'] .w { opacity: 1; stroke-width: 3; }
+  .row[aria-selected='true'] .hi { opacity: 0.12; }
+  .row[aria-selected='true'] .org { color: var(--silk); font-weight: 600; }
+  .row:focus-visible { outline-offset: -2px; }
+
+  .now {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: calc(var(--lbl) + (100% - var(--lbl)) * var(--x) / 100);
+    width: 0;
+    border-left: 1px dashed var(--copper-hot);
+    pointer-events: none;
+  }
+  .now span {
+    position: absolute;
+    top: -22px;
+    right: 6px;
+    font: 600 13px/1 var(--mono);
+    color: var(--copper-hot);
+  }
+
+  .decoder { border-top: 1px solid #1f3a2e; padding: 26px clamp(16px, 3vw, 32px) 30px; }
+  .head { display: flex; justify-content: space-between; gap: 24px 40px; flex-wrap: wrap; margin-bottom: 22px; }
+  h3 { font: 800 clamp(28px, 3.2vw, 40px)/1.02 var(--display); text-transform: uppercase; color: var(--c); }
+  .dec .org { margin-top: 8px; color: var(--silk); font-size: 17px; }
+  .meas { display: grid; grid-template-columns: repeat(4, auto); gap: 4px 28px; margin: 0; align-self: start; }
+  .meas div { display: grid; gap: 4px; }
+  .meas dt { font: 500 13px/1 var(--mono); color: #9fb5a8; }
+  .meas dd { margin: 0; font: 600 15px/1.2 var(--mono); color: var(--silk); white-space: nowrap; }
+  .frames { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; max-width: 64em; }
+  .frames li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; color: var(--silk-2); }
+  .addr { font: 500 13px/1.9 var(--mono); color: var(--c); }
+
+  @media (max-width: 760px) {
+    .grid { --lbl: 112px; padding: 8px 10px 12px; }
+    .row .org { font-size: 13px; }
+    .lbl { flex-direction: column; gap: 4px; padding-right: 10px; }
+    .tick:not(.major) { display: none; }
+    .bar .hint { margin-left: 0; }
+    .meas { grid-template-columns: repeat(2, auto); }
+    .frames li { grid-template-columns: 40px minmax(0, 1fr); gap: 8px; }
+  }
+</style>

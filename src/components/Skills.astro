@@ -1,0 +1,164 @@
+---
+import { pins } from '../data/resume';
+const left = pins.filter((p) => p.n <= 4);           // top to bottom
+const right = pins.filter((p) => p.n >= 5).reverse(); // 8 at the top, 5 at the bottom
+const rowY = (i: number) => 64 + i * 58;
+const apps = ['Autonomous agriculture', 'Perception & sensing', 'Motor control', 'Production test & automation', 'Edge machine learning'];
+---
+<section id="skills" class="node" data-node data-pad-offset="28">
+  <header class="sec-head" data-pull><span class="ref">U3</span><h2>Skills</h2></header>
+
+  <article class="sheet" data-pull style="--i:1">
+    <div class="top">
+      <div>
+        <p class="pn">SK2027</p>
+        <p class="desc">Embedded, controls and perception engineer</p>
+      </div>
+      <p class="rev">Datasheet &nbsp; Rev. 2026.11</p>
+    </div>
+
+    <div class="body">
+      <figure class="fig">
+        <figcaption>Pin configuration, DIP-8 (top view)</figcaption>
+        <svg viewBox="0 0 380 300" role="img" aria-label="DIP-8 package with pins 1 to 8 labelled by skill group">
+          <rect class="pkg" x="130" y="30" width="120" height="240" rx="3" />
+          <path class="notch" d="M172 30 a18 18 0 0 0 36 0" />
+          <text class="pkgtxt" x="190" y="150" transform="rotate(-90 190 150)">SK2027</text>
+          {left.map((p, i) => (
+            <g class="pin" data-pin={p.n}>
+              <rect x="96" y={rowY(i) - 8} width="34" height="16" />
+              <text class="num" x="144" y={rowY(i) + 5}>{p.n}</text>
+              <text class="nm" x="88" y={rowY(i) + 5} text-anchor="end">{p.name}</text>
+            </g>
+          ))}
+          {right.map((p, i) => (
+            <g class="pin" data-pin={p.n}>
+              <rect x="250" y={rowY(i) - 8} width="34" height="16" />
+              <text class="num" x="236" y={rowY(i) + 5} text-anchor="end">{p.n}</text>
+              <text class="nm" x="292" y={rowY(i) + 5}>{p.name}</text>
+            </g>
+          ))}
+        </svg>
+      </figure>
+
+      <div class="apps">
+        <h3>Applications</h3>
+        <ul>{apps.map((a) => <li>{a}</li>)}</ul>
+        <h3>Description</h3>
+        <p>
+          A general-purpose engineer with a high-bandwidth software core and analog-tolerant hardware inputs.
+          Operates from the lab bench to the field, and pairs well with sensors, motors and production lines.
+        </p>
+      </div>
+    </div>
+
+    <h3 class="tt">Pin functions</h3>
+    <table class="pf">
+      <thead><tr><th>Pin</th><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        {pins.map((p) => (
+          <tr data-pin={p.n} tabindex="0">
+            <td class="n">{p.n}</td>
+            <td class="name">{p.name}</td>
+            <td class="type">{p.type}</td>
+            <td><strong>{p.title}.</strong> {p.items.join(', ')}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </article>
+</section>
+
+<script>
+  // Hovering a table row lights the matching pin on the package drawing.
+  const sheet = document.querySelector('#skills .sheet');
+  if (sheet) {
+    const set = (n: string | null) =>
+      sheet.querySelectorAll<SVGGElement>('g.pin').forEach((g) => g.classList.toggle('on', g.dataset.pin === n));
+    sheet.querySelectorAll<HTMLTableRowElement>('tr[data-pin]').forEach((tr) => {
+      tr.addEventListener('pointerenter', () => set(tr.dataset.pin ?? null));
+      tr.addEventListener('focus', () => set(tr.dataset.pin ?? null));
+      tr.addEventListener('pointerleave', () => set(null));
+      tr.addEventListener('blur', () => set(null));
+    });
+    sheet.querySelectorAll<SVGGElement>('g.pin').forEach((g) => {
+      g.addEventListener('pointerenter', () => {
+        set(g.dataset.pin ?? null);
+        sheet.querySelectorAll('tr[data-pin]').forEach((tr) =>
+          tr.classList.toggle('on', (tr as HTMLElement).dataset.pin === g.dataset.pin));
+      });
+      g.addEventListener('pointerleave', () => {
+        set(null);
+        sheet.querySelectorAll('tr.on').forEach((tr) => tr.classList.remove('on'));
+      });
+    });
+  }
+</script>
+
+<style>
+  .sheet {
+    background: var(--paper);
+    color: var(--ink);
+    padding: clamp(20px, 4vw, 48px);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.45);
+  }
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 16px;
+    border-bottom: 3px solid var(--ink);
+  }
+  .pn { font: 900 clamp(44px, 6vw, 72px)/0.9 var(--display); }
+  .desc { font: 600 18px/1.3 var(--body); margin-top: 8px; }
+  .rev { font: 500 13px/1 var(--mono); color: var(--ink-2); }
+
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(20px, 4vw, 56px);
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(18, 22, 15, 0.25);
+  }
+  .fig { margin: 0; }
+  figcaption, h3 { font: 700 15px/1.3 var(--body); margin: 0 0 10px; }
+  svg { width: 100%; height: auto; max-width: 440px; }
+  .pkg { fill: #22261f; }
+  .notch { fill: var(--paper); }
+  .pkgtxt { fill: #d9d4c4; font: 700 22px var(--mono); text-anchor: middle; dominant-baseline: middle; letter-spacing: 0.1em; }
+  .pin rect { fill: #9b9f97; transition: fill 0.2s; }
+  .pin .num { fill: #d9d4c4; font: 600 13px var(--mono); }
+  .pin .nm { fill: var(--ink); font: 700 15px var(--mono); transition: fill 0.2s; }
+  .pin { cursor: default; }
+  .pin.on rect { fill: var(--copper); }
+  .pin.on .nm { fill: #8a4a0e; }
+
+  .apps ul { margin: 0 0 22px; padding-left: 18px; }
+  .apps li { margin: 2px 0; }
+  .apps p { color: var(--ink-2); max-width: 36em; }
+
+  .tt { margin-top: 26px; }
+  .pf { width: 100%; border-collapse: collapse; font-size: 16px; }
+  .pf th {
+    text-align: left;
+    font: 700 13px/1 var(--mono);
+    background: #e1dbc8;
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .pf td { padding: 11px 12px; border-bottom: 1px solid rgba(18, 22, 15, 0.18); vertical-align: top; }
+  .pf .n, .pf .name, .pf .type { font: 600 14px/1.5 var(--mono); white-space: nowrap; }
+  .pf .type { color: var(--ink-2); }
+  .pf tr { transition: background 0.2s; outline: none; }
+  .pf tbody tr:hover, .pf tbody tr:focus, .pf tbody tr.on { background: #ece4cd; }
+
+  @media (max-width: 760px) {
+    .body { grid-template-columns: 1fr; }
+    .pf thead { display: none; }
+    .pf tr { display: grid; grid-template-columns: auto auto 1fr; gap: 0 14px; padding: 10px 0; border-bottom: 1px solid rgba(18, 22, 15, 0.18); }
+    .pf td { border: 0; padding: 2px 0; }
+    .pf td:last-child { grid-column: 1 / -1; }
+  }
+</style>

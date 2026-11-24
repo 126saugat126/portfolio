@@ -1,0 +1,116 @@
+---
+import { person } from '../data/resume';
+const pins = [
+  { net: 'EMAIL', value: person.email, href: `mailto:${person.email}` },
+  { net: 'PHONE', value: person.phone, href: `tel:${person.phone.replace(/[^0-9+]/g, '')}` },
+  { net: 'LINKEDIN', value: 'saugat-karki', href: person.linkedin },
+  { net: 'GITHUB', value: '126saugat126', href: person.github },
+];
+const year = new Date().getFullYear();
+---
+<section id="contact" class="node" data-node data-pad-offset="28">
+  <header class="sec-head" data-pull><span class="ref">J1</span><h2>Contact</h2></header>
+
+  <p class="lead" data-pull style="--i:1">Open to full-time roles after graduating in May 2027. The fastest route is email.</p>
+
+  <div class="header" data-pull style="--i:2">
+    <div class="housing" aria-hidden="true">
+      {pins.map((_, i) => <span class:list={['pin', { sq: i === 0 }]}></span>)}
+    </div>
+    <ul class="nets">
+      {pins.map((p, i) => (
+        <li>
+          <span class="no">{i + 1}</span>
+          <span class="net">{p.net}</span>
+          <a href={p.href} target={p.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{p.value}</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <footer class="fab" data-pull style="--i:3">
+    <h3>Fabrication notes</h3>
+    <ol>
+      <li>Built with Astro and Three.js. Board art is generated on load.</li>
+      <li>Hosted on GitHub Pages.</li>
+      <li>&copy; {year} {person.name}, {person.location}.</li>
+    </ol>
+  </footer>
+</section>
+
+<style>
+  .lead { font-size: clamp(20px, 2vw, 26px); line-height: 1.4; max-width: 28em; margin-bottom: 44px; }
+
+  .header { --n: 4; }
+  .housing {
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    background: #101311;
+    border: 1px solid #2b322d;
+    border-radius: 3px;
+    height: 64px;
+  }
+  .pin {
+    place-self: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 6px #1d221f, inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+  }
+  .pin.sq { border-radius: 2px; }
+  .nets {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nets li {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    text-align: center;
+    position: relative;
+  }
+  /* trace from pin down to its label */
+  .nets li::before { content: ''; width: 3px; height: 34px; background: var(--copper); }
+  .no { font: 500 13px/1 var(--mono); color: var(--silk-2); }
+  .net { font: 800 24px/1 var(--display); letter-spacing: 0.04em; }
+  .nets a {
+    font: 500 15px/1.4 var(--body);
+    color: var(--copper-hot);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    overflow-wrap: anywhere;
+    padding: 6px 0;
+  }
+  .nets a:hover { color: var(--silk); }
+
+  .fab { margin-top: 110px; padding-top: 22px; border-top: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; gap: 12px 40px; }
+  .fab h3 { font: 600 13px/1.6 var(--mono); color: var(--silk-2); }
+  .fab ol { margin: 0; padding-left: 20px; color: var(--silk-2); font-size: 15px; }
+
+  @media (max-width: 760px) {
+    /* connector turns vertical: pins down the left, nets to the right */
+    .header { display: grid; grid-template-columns: 60px minmax(0, 1fr); }
+    .housing { grid-template-columns: 1fr; grid-template-rows: repeat(4, 72px); height: auto; }
+    .nets { grid-template-columns: 1fr; grid-template-rows: repeat(4, 72px); }
+    .nets li {
+      grid-template-columns: 20px auto;
+      grid-template-rows: auto auto;
+      justify-items: start;
+      align-content: center;
+      column-gap: 10px;
+      row-gap: 2px;
+      text-align: left;
+      padding: 0 0 0 0;
+    }
+    .nets li::before { grid-row: 1 / 3; width: 20px; height: 3px; align-self: center; }
+    .no { display: none; }
+    .net { font-size: 20px; }
+    .nets a { padding: 2px 0; }
+    .fab { grid-template-columns: 1fr; margin-top: 70px; }
+  }
+</style>
