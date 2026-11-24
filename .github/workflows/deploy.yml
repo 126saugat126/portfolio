@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Set base path
         run: |
           if [ "${{ github.event.repository.name }}" = "${{ github.repository_owner }}.github.io" ]; then
@@ -27,6 +30,8 @@ jobs:
             echo "BASE_PATH=/${{ github.event.repository.name }}" >> $GITHUB_ENV
           fi
       - uses: withastro/action@v3
+        with:
+          node-version: 22
 
   deploy:
     needs: build
